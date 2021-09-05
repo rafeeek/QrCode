@@ -1,0 +1,189 @@
+﻿@model IEnumerable<QR_BLL.Models.StudentsDetailVM>
+
+@{
+    ViewData["Title"] = "All Students";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="height:100px"></div>
+<div class="container-fluid ">
+<div class="row clearfix ">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card p-3">
+            <div class="header">
+                <h2>Welcome To Students Page</h2>
+                <button data-toggle="modal" data-target="#AddModal" value="AddNewActor" class="btn btn-primary mt-4">Add New Students</button>
+            </div>
+            <div class="body mt-5">
+                <div class="table-responsive w-100 mx-auto">
+                    <table class="table table-bordered table-striped table-hover js-basic-example dataTable">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Emergency Number</th>
+                                <th>City</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        @foreach(var data in Model)
+                        {
+                            <tr>
+                                <td>@data.Id</td>
+                                <td>@data.Name</td>
+                                <td>@data.EmergencyNumber</td>
+                                <td>@data.City</td>
+                                <td class="text-center">
+                                <a asp-controller="Students" asp-action="Details" title="Details" asp-route-QrId="@data.GetById"><button class="btn btn-primary"><i class="far fa-address-card"></i></button></a>
+                                <a asp-controller="Students" asp-action="Update" title="Update" asp-route-id="@data.Id"><button class="btn btn-info"><i class="far fa-edit"></i></button></a>
+                                <a data-toggle="modal" data-target="#exampleModal1" title="Delete" class="Delete" data-id="@data.GetById" asp-route-id="@data.Id"><button class="btn btn-danger"><i class="fas fa-trash"></i></button></a>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade " id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Delete Confirmation</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                            </button>
+                                          </div>
+                                          <div class="modal-body text-dark" style="font-weight : 700;">
+                                            Are you sure you want to Delete this Data?!
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-danger confirmdelete">Delete</button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }      
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+<div class="modal fade " id="AddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add New Students</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body text-dark" style="font-weight : 600;">
+            <div class="row">
+                <div class="col-md-12">
+                <form>
+                    <div class="form-group">
+                        <label  class="control-label">Name</label>
+                        <input id="Name" required  class="form-control name" />
+                    </div>
+                    <div class="form-group">
+                        <label  class="control-label">Age</label>
+                        <input id="Age" required class="form-control Age" />
+                    </div>
+                    <div class="form-group">
+                        <label  class="control-label">Emergency Number</label>
+                        <input id="Emergency" required class="form-control EmergencyNumber" />
+                    </div>
+                    <div class="form-group">
+                        <label  class="control-label">City</label>
+                        <input id="City" required class="form-control City" />
+                    </div>
+                </form>
+            </div>
+		    </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-primary confirmAdd">Add New Students</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+@section table{
+    <script>
+        $(function () {
+            $('.js-basic-example').DataTable({
+                responsive: true,
+                paging: true,
+                pageLength: 10,
+                bSort: true,
+                bFilter: true,
+                bLengthChange: true,
+                bInfo: true,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+
+            });
+        });
+    </script>
+
+    <script>
+        $(".confirmAdd").click(()=>{
+              var settings = {
+              "url": "http://localhost:58672/Students/Creat",
+              "method": "POST",
+              "timeout": 0,
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "data": JSON.stringify({
+                "Name": $(".name").val(),
+                "Age": $(".Age").val(),
+                "EmergencyNumber": $(".EmergencyNumber").val(),
+                "City": $(".City").val()
+              }),
+            };
+
+            $.ajax(settings).done(function (response) {
+              $('#AddModal').modal('hide');
+              location.reload(true);
+            });
+        })
+	</script>
+
+        <script>
+        let idToDelete = null
+        let deleteBtn = document.querySelectorAll(".Delete");
+        let confirmdelete = document.querySelector(".confirmdelete");
+
+        deleteBtn.forEach(one => one.addEventListener("click" , () => {idToDelete = one.dataset.id;}))
+            confirmdelete.addEventListener("click" , ()=>{
+            $.ajax({
+            type: "POST",
+            url: "/Students/Deleteajax",
+            data: {deleteid : idToDelete},
+            success : (res) => {
+                $('#exampleModal1').modal('hide');
+                window.location.reload()
+                }
+                })
+                
+            })
+    </script>
+}
+
+
